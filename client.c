@@ -1,27 +1,42 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <signal.h>
-#include <string.h>
+#include "minitalk.h"
 
-int main(int argc, char *argv[]) {
-    if (argc != 3) {
-        printf("Usage: %s <server_pid> <message>\n", argv[0]);
-        return 1;
+void send_char(pid_t pid, unsigned char c)
+{
+    for (int i = 0; i < 8; i++)
+    {
+        if (c & (1 << i))
+            kill(pid, SIGUSR1);
+        else
+            kill(pid, SIGUSR2);
+        usleep(400);
     }
-    
-    pid_t server_pid = atoi(argv[1]);
-    char *message = argv[2];
-    
-    // Send each character of the message to the server as SIGUSR1 signals
-    for (int i = 0; i < strlen(message); i++) {
-        if (message[i] == '0') {
-            kill(server_pid, SIGUSR1);
-        } else {
-            kill(server_pid, SIGUSR2);
-        }
-        usleep(50000); // Sleep for 50 milliseconds
+}
+
+int main(int argc, char **argv)
+{
+    long    i;
+    char    *message;
+    pid_t   server_pid;
+
+    i = 0;
+    if (argc != 3)
+    {
+        fprintf(stderr, "Usage: %s <server_pid> <string>\n", argv[0]);
+        return (1);
     }
-    
-    return 0;
+    server_pid = atoi(argv[1]);
+    if (server_pid <= 0)
+    {
+        printf ("hamza is gay\n");
+        return (1);
+    }
+    message = argv[2];
+    while (message[i] != '\0')
+    {
+        send_char(server_pid, message[i]);
+        i++;
+    }
+    send_char(server_pid, '\0');
+
+    return (0);
 }

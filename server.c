@@ -1,35 +1,35 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <signal.h>
+// server.c
+#include "minitalk.h"
 
-volatile sig_atomic_t received = 0;
+void handle_signal(int sig)
+{
+    static unsigned char c;
+    static int bits;
 
-void handler(int sig) {
-    received = sig;
-}
-
-int main() {
-    // Set up signal handlers
-    signal(SIGUSR1, handler);
-    
-    // Print server PID
-    printf("Server PID: %d\n", getpid());
-    
-    while (1) {
-        // Wait for signals indefinitely
-        pause();
-        
-        // If received SIGUSR1
-        if (received == SIGUSR1) {
-            printf("Message received from client: ");
-            fflush(stdout);
-            
-            // Reset received flag
-            received = 0;
-        }
+    if (sig == SIGUSR1)
+        c |= (1 << bits);
+    bits++;
+    if (bits == 8)
+    {
+        write(1, &c, 1);
+        bits = 0;
+        c = 0;
     }
-    
-    return 0;
 }
 
+int main(void)
+{
+    pid_t pid;
+    struct sigaction sa;
+
+    pid = getpid();
+    printf("Server PID: %d\n", pid);
+    sa.sa_handler = &handle_signal;
+    sigaction(SIGUSR1, &sa, NULL);
+    sigaction(SIGUSR2, &sa, NULL);
+    // signal(SIGUSR1, handle_signal);
+    // signal(SIGUSR2, handle_signal);
+    while (1)
+        pause();
+    return (0);
+}

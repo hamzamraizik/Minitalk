@@ -1,30 +1,58 @@
-CFILE = client.c
-SFILE = server.c
-O_CFILE = client.o
-O_SFILE = server.o
-CFLAGS = -Wall -Wextra
+NAME_SERVER = server
+NAME_CLIENT = client
 CC = cc
-RM = rm -f
+CFLAGS = -Wall -Wextra -Werror
+SRCS_SERVER = server.c
+SRCS_CLIENT = client.c
+OBJS_SERVER = $(SRCS_SERVER:.c=.o)
+OBJS_CLIENT = $(SRCS_CLIENT:.c=.o)
 
-all: server client
+%.o: %.c minitalk.h
+	$(CC) $(CFLAGS) -c $< -o $@
+all: $(NAME_SERVER) $(NAME_CLIENT)
 
-client.o : client.c
-	$(CC) $(CFLAGS) -c $<
+$(NAME_SERVER): $(OBJS_SERVER)
+	$(CC) $(CFLAGS) $(OBJS_SERVER)  -o $(NAME_SERVER) 
 
-server.o : server.c
-	$(CC) $(CFLAGS) -c $<
-
-server: $(OFILES)
-	$(CC) $(CFLAGS) -o $@ $(O_SFILE)
-
-
-client: $(OFILES)
-	$(CC) $(CFLAGS) -o $@ $(O_CFILE)
+$(NAME_CLIENT): $(OBJS_CLIENT)
+	$(CC) $(CFLAGS) $(OBJS_CLIENT) -o $(NAME_CLIENT)
 
 clean:
-	$(RM) $(O_CFILE) $(O_SFILE)
+	rm -f $(OBJS_SERVER) $(OBJS_CLIENT)
 
 fclean: clean
-	$(RM) server client
+	rm -f $(NAME_SERVER) $(NAME_CLIENT)
 
 re: fclean all
+
+
+# NAME_SERVER = server
+# NAME_CLIENT = client
+# CC = cc
+# CFLAGS = -Wall -Wextra -Werror
+# SRCS_SERVER = server.c
+# SRCS_CLIENT = client.c
+# OBJS_SERVER = $(SRCS_SERVER:.c=.o)
+# OBJS_CLIENT = $(SRCS_CLIENT:.c=.o)
+
+# %.o: %.c minitalk.h
+#     $(CC) $(CFLAGS) -c $< -o $@
+
+# all: $(NAME_SERVER) $(NAME_CLIENT)
+
+# $(NAME_SERVER): $(OBJS_SERVER)
+#     $(CC) $(CFLAGS) $(OBJS_SERVER) -o $(NAME_SERVER)
+
+# $(NAME_CLIENT): $(OBJS_CLIENT)
+#     $(CC) $(CFLAGS) $(OBJS_CLIENT) -o $(NAME_CLIENT)
+
+# clean:
+#     rm -f $(OBJS_SERVER) $(OBJS_CLIENT)
+
+# fclean: clean
+#     rm -f $(NAME_SERVER) $(NAME_CLIENT)
+
+# re: fclean all
+
+# .PHONY: all clean fclean re
+
