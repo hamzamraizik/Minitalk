@@ -7,7 +7,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-void handle_signal(int sig);
+void handle_signal(int sig, siginfo_t *info, void *context);
 void send_char(pid_t pid, unsigned char c);
 
 #endif
