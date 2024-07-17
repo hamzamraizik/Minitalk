@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   client.c                                           :+:      :+:    :+:   */
+/*   client_bonus.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: hmraizik <hmraizik@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/20 21:31:59 by hmraizik          #+#    #+#             */
-/*   Updated: 2024/05/29 19:01:58 by hmraizik         ###   ########.fr       */
+/*   Updated: 2024/05/29 19:07:13 by hmraizik         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,12 +34,21 @@ void	send_char(pid_t pid, unsigned char c)
 	}
 }
 
+void	handle_signal(int seg)
+{
+	if (seg == SIGUSR1)
+		write(1, "message sended successfully\n", 28);
+}
+
 int	main(int argc, char **argv)
 {
-	long	i;
-	char	*message;
-	pid_t	server_pid;
+	long				i;
+	char				*message;
+	pid_t				server_pid;
+	struct sigaction	sa;
 
+	sa.sa_handler = handle_signal;
+	sigaction(SIGUSR1, &sa, NULL);
 	i = 0;
 	if (argc != 3)
 		usage("Usage: %s <server_pid> <string>");
